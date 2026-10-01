@@ -10,7 +10,7 @@ app.use(cors({
     origin: (origin, callback) => {
         const allowedOrigins = [
             "http://localhost:5173",
-            // "https://your-frontend.vercel.app"
+            "https://resume-jd-skillgap.vercel.app"
         ]
 
         if (!origin || allowedOrigins.includes(origin)) {
