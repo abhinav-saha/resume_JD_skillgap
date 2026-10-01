@@ -1,7 +1,7 @@
 const { GoogleGenAI } = require("@google/genai")
 const { z } = require("zod")
 const { zodToJsonSchema } = require("zod-to-json-schema")
-
+const puppeteer = require("puppeteer")
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_GENAI_API_KEY
@@ -35,20 +35,58 @@ const interviewReportSchema = z.object({
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
 
 
-    const prompt = `Generate an interview report for a candidate with the following details:
-                        Resume: ${resume}
-                        Self Description: ${selfDescription}
-                        Job Description: ${jobDescription}
-`
+  const prompt = `
+Generate a highly challenging interview report for this candidate.
+
+RESUME:
+${resume}
+
+SELF DESCRIPTION:
+${selfDescription}
+
+JOB DESCRIPTION:
+${jobDescription}
+
+IMPORTANT INSTRUCTIONS:
+
+1. Generate EXACTLY 6 technical interview questions.
+2. Generate EXACTLY 6 behavioral interview questions.
+3. Questions must be significantly harder than basic/entry-level interview questions.
+4. Technical questions should test deep understanding, problem-solving, trade-offs, debugging, system behavior, optimization, and real-world engineering scenarios.
+5. Avoid generic textbook questions such as "What is X?" or "Explain X".
+6. Prefer questions such as:
+   - "Given this scenario, how would you design..."
+   - "Why would you choose X over Y under these constraints?"
+   - "How would you debug..."
+   - "What happens internally when..."
+   - "How would you optimize..."
+   - "What trade-offs would you consider..."
+7. Questions must be tailored specifically to the job description and candidate's resume.
+8. If the candidate claims a technology/project in their resume, use it to create deeper follow-up questions.
+9. Behavioral questions should also be challenging and should probe decision-making, conflict handling, failures, ownership, ambiguity, technical disagreements, and real project situations.
+10. Do NOT generate filler questions just to reach the required count.
+11. The interview should feel like a difficult interview at a strong product/company engineering team.
+
+For every question provide:
+- The question
+- The interviewer's intention
+- A strong model answer explaining the concepts, reasoning, trade-offs and approach.
+`;
+
+const schema = zodToJsonSchema(interviewReportSchema)
+
+console.log("SCHEMA BEING SENT:", JSON.stringify(schema, null, 2))
 
     const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-3.5-flash-lite",
         contents: prompt,
         config: {
             responseMimeType: "application/json",
             responseSchema: zodToJsonSchema(interviewReportSchema),
         }
     })
+
+    console.log(response.text)
 
     return JSON.parse(response.text)
 
@@ -96,7 +134,7 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
                     `
 
     const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
+        model: "gemini-3.5-flash-lite",
         contents: prompt,
         config: {
             responseMimeType: "application/json",

@@ -99,6 +99,7 @@ async function loginUserController(req, res) {
     })
 }
 
+
 /**
  * @name logoutUserController
  * @description clear token from user cookie and add the token in blacklist
@@ -117,7 +118,6 @@ async function logoutUserController(req, res) {
         message: "User logged out successfully"
     })
 }
-
 
 /**
  * @name getMeController
@@ -143,7 +143,7 @@ async function getMeController(req, res) {
 
 
 
-module.exports={
+module.exports = {
     registerUserController,
     loginUserController,
     logoutUserController,
